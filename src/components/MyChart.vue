@@ -5,7 +5,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import Chart from 'chart.js'
-import { Days } from '../lib/Days'
+import { Days, net } from '../lib/Days'
 
 @Component
 export default class MyChart extends Vue {
@@ -27,22 +27,27 @@ export default class MyChart extends Vue {
   }
 
   get labels (): string[] {
-    return this.days.map((day, index) => index + 1)
+    return this.days.map((day, index) => (index + 1).toString())
   }
 
   get goalData (): number[] {
     return this.days.map((day, i) => {
-      return i * -500
+      return (i + 1) * -500
     })
   }
 
-  get actualData (): number[] {
+  get actualData (): any[] {
+    let cumm = 0
     return this.days.reduce((acc, day) => {
-      const lastValue = acc[acc.length - 1] || 0
-      const net = this.BMR + day.caloriesOut - day.caloriesIn
-      acc.push(lastValue - net)
+      const dayNet = net(this.BMR, day)
+      if (dayNet) {
+        cumm += dayNet
+        acc.push(cumm)
+      } else {
+        acc.push(null)
+      }
       return acc
-    }, [] as number[])
+    }, [] as any[])
   }
 
   mounted () {

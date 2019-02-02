@@ -4,8 +4,8 @@
       <inputs
         :days="days"
         :bmr="BMR"
-        @updateCaloriesIn="updateCaloriesIn"
         @updateCaloriesOut="updateCaloriesOut"
+        @updateCaloriesIn="updateCaloriesIn"
       />
     </div>
     <div class="charts-container">
@@ -40,28 +40,52 @@ export default class App extends Vue {
   days: Days = days
   BMR = 2000
 
-  updateCaloriesIn (index: number, calories: number) {
-    this.days[index].caloriesIn = calories
-    console.log(index, calories)
+  updateCaloriesOut (index: number, calories: string) {
+    const processedCalories = this.processCalories(calories)
+
+    this.days[index].caloriesOut = processedCalories
   }
 
-  updateCaloriesOut (index: number, calories: number) {
-    this.days[index].caloriesOut = calories
-    console.log(index, calories)
+  updateCaloriesIn (index: number, calories: string) {
+    const processedCalories = this.processCalories(calories)
+
+    this.days[index].caloriesIn = processedCalories
+  }
+
+  processCalories (calories: string): any {
+    if (!isNaN(calories as any)) {
+      const result = parseInt(calories, 10)
+      if (isNaN(result as any)) {
+        return null
+      }
+      return result
+    } else {
+      return calories
+    }
   }
 }
 </script>
 
 <style>
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
+  font-family: Arial,x-locale-body,sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 </style>
 
 <style scoped>
 .app {
   display: grid;
-  grid-template-columns: 300px auto;
+  grid-template-columns: 400px auto;
   grid-template-rows: auto;
   height: 100vh;
 }

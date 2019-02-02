@@ -1,32 +1,51 @@
 <template>
   <div class="inputs">
-    <div
-      v-for="(day, i) in days"
-      class="input-row"
-      :key="i"
-    >
-      <span class="day-label">{{i + 1}}:</span>
-      {{-BMR}} -
-      <input
-        :value="caloriesValue(day.caloriesOut)"
-        class="calories-out"
-        @input="$emit('updateCaloriesOut', i, $event.target.value)"
-      />
-      +
-      <input
-        :value="caloriesValue(day.caloriesIn)"
-        class="calories-in"
-        @input="$emit('updateCaloriesIn', i, $event.target.value)"
-      />
-      =
-      {{net(day)}}
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th class="day">Day</th>
+          <th class="bmr">BMR</th>
+          <th class="c-out">Out</th>
+          <th class="c-in">In</th>
+          <th class="net">Net</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(day, i) in days"
+          class="input-row"
+          :key="i"
+        >
+          <td class="day">{{i + 1}}</td>
+          <td class="bmr">{{BMR}}</td>
+          <td
+            class="c-out"
+            :class="{ error: invalid(day.caloriesOut) }"
+          >
+            <input
+              @input="$emit('updateCaloriesOut', i, $event.target.value)"
+              :value="day.caloriesOut"
+            >
+          </td>
+          <td
+            class="c-in"
+            :class="{ error: invalid(day.caloriesIn) }"
+          >
+            <input
+              @input="$emit('updateCaloriesIn', i, $event.target.value)"
+              :value="day.caloriesIn"
+            >
+          </td>
+          <td class="net">{{net(day)}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { Days, Day } from '../lib/Days'
+import { Days, Day, net } from '../lib/Days'
 
 @Component
 export default class Inputs extends Vue {
@@ -39,8 +58,12 @@ export default class Inputs extends Vue {
     return calories ? calories.toString() : ''
   }
 
-  net (day: Day): number {
-    return -this.BMR - day.caloriesOut + day.caloriesIn
+  net (day: Day): number | null {
+    return net(this.BMR, day)
+  }
+
+  invalid (calories: string): boolean {
+    return isNaN(calories as any)
   }
 }
 </script>
@@ -51,14 +74,55 @@ export default class Inputs extends Vue {
   height: 100%;
 }
 
-.calories-in,
-.calories-out {
-  width: 50px;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.day-label {
-  display: inline-block;
-  width: 21px;
+th, td {
+  border: solid #e0e0dc;
+  border-width: 0 1px 1px 0;
+}
+
+th {
+  background-color: rgba(212, 221, 228, .5);
+  text-align: center;
+}
+
+td {
   text-align: right;
+}
+
+td.error {
+  background-color: rgb(255, 175, 175);
+}
+
+th, td, input {
+  padding: 3px 5px;
+  font-size: 14px;
+}
+
+.day {
+  width: 10%;
+}
+
+.bmr, .c-in, .c-out, .net {
+  width: 22.5%;
+}
+
+.c-in,
+.c-out {
+  padding: 0;
+}
+
+input {
+  border: 0;
+  width: 100%;
+  background: transparent;
+  text-align: right;
+}
+
+input:focus {
+  outline: none;
 }
 </style>
