@@ -5,15 +5,12 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import Chart from 'chart.js'
-import { Days, net } from '../lib/Days'
+import { Days, net } from '../lib/day'
 
 @Component
 export default class MyChart extends Vue {
   @Prop()
   public days!: Days
-
-  @Prop()
-  public BMR!: number
 
   @Watch('days', { deep: true })
   onDaysChanged (val: Days, oldVal: Days) {
@@ -39,7 +36,7 @@ export default class MyChart extends Vue {
   get actualData (): any[] {
     let cumm = 0
     return this.days.reduce((acc, day) => {
-      const dayNet = net(this.BMR, day)
+      const dayNet = net(day)
       if (dayNet) {
         cumm += dayNet
         acc.push(cumm)
@@ -61,17 +58,17 @@ export default class MyChart extends Vue {
         labels: this.labels,
         datasets: [
           {
+            label: 'actual',
+            data: this.actualData,
+            backgroundColor: 'rgb(54, 162, 235)',
+            borderColor: 'rgb(54, 162, 235)',
+            fill: false
+          }, {
             label: 'goal',
             data: this.goalData,
             borderDash: [5],
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
-            fill: false
-          }, {
-            label: 'actual',
-            data: this.actualData,
-            backgroundColor: 'rgb(54, 162, 235)',
-            borderColor: 'rgb(54, 162, 235)',
             fill: false
           }
         ]
@@ -80,7 +77,7 @@ export default class MyChart extends Vue {
   }
 
   recalculateChart () {
-    this.chart.data.datasets![1].data = this.actualData
+    this.chart.data.datasets![0].data = this.actualData
     this.chart.update()
   }
 }

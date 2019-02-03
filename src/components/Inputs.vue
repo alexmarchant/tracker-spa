@@ -17,7 +17,7 @@
           :key="i"
         >
           <td class="day">{{i + 1}}</td>
-          <td class="bmr">{{BMR}}</td>
+          <td class="bmr">{{day.bmr}}</td>
           <td
             class="c-out"
             :class="{ error: invalid(day.caloriesOut) }"
@@ -45,21 +45,19 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { Days, Day, net } from '../lib/Days'
+import { Days, Day, net } from '../lib/day'
 
 @Component
 export default class Inputs extends Vue {
   @Prop()
-  public days!: Days;
-
-  BMR = 2000
+  public days!: Days
 
   caloriesValue (calories: number | null): string {
     return calories ? calories.toString() : ''
   }
 
   net (day: Day): number | null {
-    return net(this.BMR, day)
+    return net(day)
   }
 
   invalid (calories: string): boolean {
