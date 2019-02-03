@@ -1,6 +1,5 @@
 import { Days } from '../day'
-
-const BASE_URL = 'http://localhost:3000'
+import { BASE_URL } from './index'
 
 export async function create (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
   const year = date.getFullYear()
