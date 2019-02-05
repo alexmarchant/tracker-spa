@@ -69,7 +69,7 @@ export default class Inputs extends Vue {
 
   get totalCalories (): number {
     return this.days.reduce((sum, day) => {
-      return sum + net(day)
+      return sum + (net(day) || 0)
     }, 0)
   }
 
