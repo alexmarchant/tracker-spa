@@ -14,6 +14,7 @@
         <tr
           v-for="(day, i) in days"
           class="input-row"
+          :class="{ future: futureDay(day) }"
           :key="i"
         >
           <td class="day">{{i + 1}}</td>
@@ -25,6 +26,7 @@
             <input
               @input="$emit('updateCaloriesOut', i, $event.target.value)"
               :value="day.caloriesOut"
+              :disabled="futureDay(day)"
             >
           </td>
           <td
@@ -34,6 +36,7 @@
             <input
               @input="$emit('updateCaloriesIn', i, $event.target.value)"
               :value="day.caloriesIn"
+              :disabled="futureDay(day)"
             >
           </td>
           <td class="net">{{net(day)}}</td>
@@ -65,6 +68,10 @@ export default class Inputs extends Vue {
 
   invalid (calories: string): boolean {
     return isNaN(calories as any)
+  }
+
+  futureDay (day: Day): boolean {
+    return day.date > new Date()
   }
 
   get totalCalories (): number {
@@ -111,6 +118,10 @@ td.error {
 th, td, input {
   padding: 3px 5px;
   font-size: 14px;
+}
+
+tr.future {
+  background-color: rgba(228, 228, 228, .5);
 }
 
 .day {
