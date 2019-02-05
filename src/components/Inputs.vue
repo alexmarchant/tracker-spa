@@ -40,6 +40,9 @@
         </tr>
       </tbody>
     </table>
+    <div class="total">
+      Total: {{totalCalories}} C | {{totalPounds}} lbs
+    </div>
   </div>
 </template>
 
@@ -62,6 +65,16 @@ export default class Inputs extends Vue {
 
   invalid (calories: string): boolean {
     return isNaN(calories as any)
+  }
+
+  get totalCalories (): number {
+    return this.days.reduce((sum, day) => {
+      return sum + net(day)
+    }, 0)
+  }
+
+  get totalPounds (): number {
+    return Math.round(this.totalCalories * 100 / 3500) / 100
   }
 }
 </script>
@@ -122,5 +135,12 @@ input {
 
 input:focus {
   outline: none;
+}
+
+.total {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: right;
 }
 </style>
