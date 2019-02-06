@@ -1,5 +1,6 @@
 <template>
   <div class="inputs">
+    <h2 class="month">{{month}}</h2>
     <table>
       <thead>
         <tr>
@@ -52,6 +53,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { Days, Day, net } from '../lib/day'
+import { format } from 'date-fns'
 
 @Component
 export default class Inputs extends Vue {
@@ -83,13 +85,24 @@ export default class Inputs extends Vue {
   get totalPounds (): number {
     return Math.round(this.totalCalories * 100 / 3500) / 100
   }
+
+  get month (): string {
+    return format(new Date(), 'MMM YY')
+  }
 }
 </script>
 
 <style scoped>
 .inputs {
-  border-right: 1px solid black;
+  border-right: 1px solid #b5b5b5;
   height: 100%;
+}
+
+.month {
+  text-align: center;
+  font-size: 16px;
+  margin: 0;
+  padding: 10px 0;
 }
 
 table {
