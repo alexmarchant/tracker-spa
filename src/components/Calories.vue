@@ -59,7 +59,7 @@ export default class Calories extends Vue {
   async mounted () {
     let days
     try {
-      days = await api.calories.index(new Date())
+      days = await api.days.index(new Date())
     } catch (err) {
       console.error(err)
       return
@@ -115,7 +115,7 @@ export default class Calories extends Vue {
 
   async apiUpdateDay (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
     try {
-      await api.calories.create(
+      await api.days.create(
         date,
         bmr,
         caloriesIn,

@@ -1,12 +1,5 @@
-import { index, create } from './calories'
-
-export const BASE_URL = document.location.host.match('localhost')
-  ? `http://localhost:3000`
-  : 'http://api.tracker.alexmarchant.com'
+import * as days from './days'
 
 export default {
-  calories: {
-    index,
-    create
-  }
+  days
 }
