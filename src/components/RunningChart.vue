@@ -28,8 +28,16 @@ export default class RunningChart extends Vue {
   }
 
   get goalData (): number[] {
-    return this.days.map((day, i) => {
-      return (i + 1) * 2.14
+    let total = 0
+    return [
+      null, null, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2
+    ].map(miles => {
+      total += (miles || 0)
+      return total
     })
   }
 
@@ -61,14 +69,16 @@ export default class RunningChart extends Vue {
             data: this.actualData,
             backgroundColor: 'rgb(54, 162, 235)',
             borderColor: 'rgb(54, 162, 235)',
-            fill: false
+            fill: false,
+            spanGaps: true
           }, {
             label: 'goal',
             data: this.goalData,
             borderDash: [5],
             backgroundColor: 'rgb(255, 99, 132)',
             borderColor: 'rgb(255, 99, 132)',
-            fill: false
+            fill: false,
+            spanGaps: true
           }
         ]
       }
