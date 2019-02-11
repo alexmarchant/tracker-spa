@@ -34,17 +34,16 @@ export default class MyChart extends Vue {
   }
 
   get actualData (): any[] {
-    let cumm = 0
-    return this.days.reduce((acc, day) => {
+    let total = 0
+    return this.days.map(day => {
       const dayNet = net(day)
       if (dayNet) {
-        cumm += dayNet
-        acc.push(cumm)
+        total += dayNet
+        return total
       } else {
-        acc.push(null)
+        return null
       }
-      return acc
-    }, [] as any[])
+    })
   }
 
   mounted () {

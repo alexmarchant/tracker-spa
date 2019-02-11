@@ -73,7 +73,7 @@ export default class Calories extends Vue {
           day.date.getMonth() === resDate.getMonth() &&
           day.date.getDate() === resDate.getDate()
         ) {
-          if (resDay.milesRun) {
+          if (resDay.milesRun !== undefined) {
             day.milesRun = resDay.milesRun
           }
         }

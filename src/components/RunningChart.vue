@@ -42,16 +42,15 @@ export default class RunningChart extends Vue {
   }
 
   get actualData (): any[] {
-    let cumm = 0
-    return this.days.reduce((acc, day) => {
-      if (day.milesRun) {
-        cumm += day.milesRun
-        acc.push(cumm)
+    let total = 0
+    return this.days.map(day => {
+      if (day.milesRun !== undefined && day.milesRun !== null) {
+        total += day.milesRun
+        return total
       } else {
-        acc.push(null)
+        return null
       }
-      return acc
-    }, [] as any[])
+    })
   }
 
   mounted () {
@@ -59,6 +58,7 @@ export default class RunningChart extends Vue {
   }
 
   createChart () {
+    console.log(this.actualData)
     this.chart = new Chart(this.context, {
       type: 'line',
       data: {

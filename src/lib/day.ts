@@ -8,10 +8,7 @@ export type Day = {
 export type Days = Day[]
 
 export function net (day: Day): number | null {
-  if (
-    (isNaN(day.caloriesOut as any) && isNaN(day.caloriesIn as any)) ||
-    (!day.caloriesOut && !day.caloriesIn)
-  ) {
+  if (!isNumber(day.caloriesOut) && !isNumber(day.caloriesIn)) {
     return null
   }
 
@@ -28,4 +25,11 @@ export function attemptParseInt (string: string): any {
   } else {
     return string
   }
+}
+
+function isNumber (value: any): boolean {
+  if (value === null || value === undefined) {
+    return false
+  }
+  return !isNaN(value)
 }
