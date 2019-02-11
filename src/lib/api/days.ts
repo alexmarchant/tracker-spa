@@ -1,12 +1,12 @@
 import { Days } from '../day'
 import { BASE_URL } from './helpers'
 
-export async function create (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
+export async function updateCalories (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null): Promise<Response> {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
   const day = date.getDate()
   return fetch(`${BASE_URL}/days/${year}/${month}/${day}`, {
-    method: 'POST',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
     },
@@ -14,6 +14,21 @@ export async function create (date: Date, bmr: number | null, caloriesIn: number
       bmr,
       caloriesIn,
       caloriesOut
+    })
+  })
+}
+
+export async function updateMilesRun (date: Date, milesRun: number | null): Promise<Response> {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return fetch(`${BASE_URL}/days/${year}/${month}/${day}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      milesRun
     })
   })
 }

@@ -21,7 +21,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs from './Inputs.vue'
 import MyChart from './MyChart.vue'
-import { Days, Day } from '../lib/day'
+import { Days, Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
 const BMR = 2000
@@ -47,7 +47,8 @@ export default class Calories extends Vue {
         date,
         bmr: BMR,
         caloriesIn: null,
-        caloriesOut: null
+        caloriesOut: null,
+        milesRun: null
       })
     }
   }
@@ -90,7 +91,7 @@ export default class Calories extends Vue {
   }
 
   updateCaloriesOut (index: number, calories: string) {
-    const processedCalories = this.processCalories(calories)
+    const processedCalories = attemptParseInt(calories)
     const day = this.days[index]
     day.caloriesOut = processedCalories
     this.apiUpdateDay(
@@ -102,7 +103,7 @@ export default class Calories extends Vue {
   }
 
   updateCaloriesIn (index: number, calories: string) {
-    const processedCalories = this.processCalories(calories)
+    const processedCalories = attemptParseInt(calories)
     const day = this.days[index]
     day.caloriesIn = processedCalories
     this.apiUpdateDay(
@@ -115,7 +116,7 @@ export default class Calories extends Vue {
 
   async apiUpdateDay (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
     try {
-      await api.days.create(
+      await api.days.updateCalories(
         date,
         bmr,
         caloriesIn,
@@ -123,18 +124,6 @@ export default class Calories extends Vue {
       )
     } catch (err) {
       console.error(err)
-    }
-  }
-
-  processCalories (calories: string): any {
-    if (!isNaN(calories as any)) {
-      const result = parseInt(calories, 10)
-      if (isNaN(result as any)) {
-        return null
-      }
-      return result
-    } else {
-      return calories
     }
   }
 }
