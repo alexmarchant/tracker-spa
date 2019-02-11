@@ -58,7 +58,6 @@ export default class RunningChart extends Vue {
   }
 
   createChart () {
-    console.log(this.actualData)
     this.chart = new Chart(this.context, {
       type: 'line',
       data: {

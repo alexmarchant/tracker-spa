@@ -9,9 +9,6 @@
     <div class="charts-container">
       <running-chart :days="days" />
     </div>
-    <div v-if="loading" class="loading-modal">
-      <div class="loading-modal-text">Loading...</div>
-    </div>
   </div>
 </template>
 
@@ -117,23 +114,5 @@ export default class Calories extends Vue {
 
 .charts-container {
   grid-area: chart;
-}
-
-.loading-modal {
-  background-color: rgba(0, 0, 0, 0.5);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.loading-modal-text {
-  font-size: 32px;
-  font-weight: bold;
-  color: white;
 }
 </style>
