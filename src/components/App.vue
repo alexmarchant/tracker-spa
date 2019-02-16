@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="app" v-if="loggedIn">
     <div class="sidebar-container">
       <sidebar />
     </div>
@@ -7,18 +7,37 @@
       <router-view />
     </div>
   </div>
+  <Auth v-else />
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import Sidebar from './Sidebar.vue'
+import Auth from './Auth.vue'
+import { getToken } from '../lib/auth'
 
 @Component({
   components: {
-    Sidebar
+    Sidebar,
+    Auth
   }
 })
 export default class App extends Vue {
+  mounted () {
+    this.checkAuth()
+  }
+
+  checkAuth () {
+    const token = getToken()
+
+    if (token) {
+      this.$store.commit('setToken', token)
+    }
+  }
+
+  get loggedIn (): boolean {
+    return !!this.$store.state.token
+  }
 }
 </script>
 
