@@ -1,8 +1,9 @@
 <template>
   <div class="calories">
     <div class="inputs-container">
-      <running-inputs
+      <inputs
         :days="days"
+        :columns="inputColumns"
         @updateMilesRun="updateMilesRun"
       />
     </div>
@@ -15,21 +16,21 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import RunningInputs from './RunningInputs.vue'
+import Inputs from './RunningInputs.vue'
 import RunningChart from './RunningChart.vue'
-import { Days, Day, attemptParseInt } from '../lib/day'
+import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
 const BMR = 2000
 
 @Component({
   components: {
-    RunningInputs,
+    Inputs,
     RunningChart
   }
 })
 export default class Calories extends Vue {
-  days: Days
+  days: Day[]
   loading = true
 
   constructor () {
@@ -50,8 +51,14 @@ export default class Calories extends Vue {
     }
   }
 
-  get bmr () {
-    return BMR
+  get inputColumns (): Column[] {
+    return [
+      {
+        title: 'Miles Run',
+        value: (day) => day.milesRun,
+        inputEvent: 'updateMilesRun'
+      }
+    ]
   }
 
   async mounted () {
@@ -111,6 +118,7 @@ export default class Calories extends Vue {
 
 .inputs-container {
   grid-area: table;
+  border-right: 1px solid #b5b5b5;
 }
 
 .charts-container {

@@ -1,4 +1,4 @@
-import { Days } from '../day'
+import { Day } from '../day'
 import { get, patch } from './helpers'
 import store from '../store'
 
@@ -31,7 +31,7 @@ export async function updateDrinks (date: Date, drinks: number | null): Promise<
   })
 }
 
-export async function index (date: Date): Promise<Days> {
+export async function index (date: Date): Promise<Day[]> {
   const res = await get(`/days/${date.getFullYear()}/${date.getMonth() + 1}`)
   const data = await res.json()
   return data.days

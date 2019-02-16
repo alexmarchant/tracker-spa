@@ -4,100 +4,84 @@
     <table>
       <thead>
         <tr>
-          <th class="day">Day</th>
-          <th class="bmr">BMR</th>
-          <th class="c-out">Out</th>
-          <th class="c-in">In</th>
-          <th class="net">Net</th>
+          <th>Day</th>
+          <th
+            v-for="(column, i) in columns"
+            :key="i"
+          >
+            {{column.title}}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr
-          v-for="(day, i) in days"
+          v-for="(day, rowI) in days"
           class="input-row"
           :class="{ future: futureDay(day) }"
-          :key="i"
+          :key="rowI"
         >
-          <td class="day">{{i + 1}}</td>
-          <td class="bmr">{{day.bmr}}</td>
-          <td
-            class="c-out"
-            :class="{ error: invalid(day.caloriesOut) }"
-          >
-            <input
-              @input="$emit('updateCaloriesOut', i, $event.target.value)"
-              :value="day.caloriesOut"
-              :disabled="futureDay(day)"
-            >
+          <td :style="{ width: `${dayWidth}%` }">
+            {{rowI + 1}}
           </td>
           <td
-            class="c-in"
-            :class="{ error: invalid(day.caloriesIn) }"
+            v-for="(column, colI) in columns"
+            :class="{ 'input-cell': column.inputEvent }"
+            :key="colI"
+            :style="{ width: `${columnWidth}%` }"
           >
-            <input
-              @input="$emit('updateCaloriesIn', i, $event.target.value)"
-              :value="day.caloriesIn"
-              :disabled="futureDay(day)"
-            >
+            <template v-if="column.inputEvent">
+              <input
+                @input="$emit(column.inputEvent, rowI, $event.target.value)"
+                :value="column.value(day)"
+                :disabled="futureDay(day)"
+              >
+            </template>
+            <template v-else>
+              {{column.value(day)}}
+            </template>
           </td>
-          <td class="net">{{net(day)}}</td>
         </tr>
       </tbody>
     </table>
-    <div class="total">
-      Total: {{totalCalories}} C | {{totalPounds}} lbs
-    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { Days, Day, net } from '../lib/day'
+import { Day, net } from '../lib/day'
 import { format } from 'date-fns'
+import { Column } from '../lib/column'
 
 @Component
 export default class Inputs extends Vue {
   @Prop()
-  public days!: Days
+  public days!: Day[]
+  @Prop()
+  public columns!: Column[]
 
-  caloriesValue (calories: number | null): string {
-    return calories ? calories.toString() : ''
-  }
-
-  net (day: Day): number | null {
-    return net(day)
-  }
-
-  invalid (calories: string): boolean {
-    return isNaN(calories as any)
+  invalid (drinks: string): boolean {
+    return isNaN(drinks as any)
   }
 
   futureDay (day: Day): boolean {
     return day.date > new Date()
   }
 
-  get totalCalories (): number {
-    return this.days.reduce((sum, day) => {
-      return sum + (net(day) || 0)
-    }, 0)
-  }
-
-  get totalPounds (): number {
-    return Math.round(this.totalCalories * 100 / 3500) / 100
-  }
-
   get month (): string {
     return format(new Date(), 'MMM YY')
+  }
+
+  get dayWidth (): number {
+    return 10
+  }
+
+  get columnWidth (): number {
+    return (100 - this.dayWidth) / this.columns.length
   }
 }
 </script>
 
 <style scoped>
-.inputs {
-  border-right: 1px solid #b5b5b5;
-  height: 100%;
-}
-
 .month {
   text-align: center;
   font-size: 16px;
@@ -133,21 +117,12 @@ th, td, input {
   font-size: 14px;
 }
 
+td.input-cell {
+  padding: 0;
+}
+
 tr.future {
   background-color: rgba(228, 228, 228, .5);
-}
-
-.day {
-  width: 10%;
-}
-
-.bmr, .c-in, .c-out, .net {
-  width: 22.5%;
-}
-
-.c-in,
-.c-out {
-  padding: 0;
 }
 
 input {
@@ -159,12 +134,5 @@ input {
 
 input:focus {
   outline: none;
-}
-
-.total {
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: right;
 }
 </style>

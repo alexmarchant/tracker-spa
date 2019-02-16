@@ -5,15 +5,15 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import Chart from 'chart.js'
-import { Days, net } from '../lib/day'
+import { Day, net } from '../lib/day'
 
 @Component
 export default class MyChart extends Vue {
   @Prop()
-  public days!: Days
+  public days!: Day[]
 
   @Watch('days', { deep: true })
-  onDaysChanged (val: Days, oldVal: Days) {
+  onDaysChanged (val: Day[], oldVal: Day[]) {
     this.recalculateChart()
   }
 

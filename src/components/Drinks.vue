@@ -1,8 +1,9 @@
 <template>
   <div class="calories">
     <div class="inputs-container">
-      <drinks-inputs
+      <inputs
         :days="days"
+        :columns="inputColumns"
         @updateDrinks="updateDrinks"
       />
     </div>
@@ -15,21 +16,21 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import DrinksInputs from './DrinksInputs.vue'
+import Inputs from './Inputs.vue'
 import DrinksChart from './DrinksChart.vue'
-import { Days, Day, attemptParseInt } from '../lib/day'
+import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
 const BMR = 2000
 
 @Component({
   components: {
-    DrinksInputs,
+    Inputs,
     DrinksChart
   }
 })
 export default class Drinks extends Vue {
-  days: Days
+  days: Day[]
   loading = true
 
   constructor () {
@@ -50,8 +51,14 @@ export default class Drinks extends Vue {
     }
   }
 
-  get bmr () {
-    return BMR
+  get inputColumns (): Column[] {
+    return [
+      {
+        title: 'Drinks',
+        value: (day) => day.drinks,
+        inputEvent: 'updateDrinks'
+      }
+    ]
   }
 
   async mounted () {
@@ -111,6 +118,7 @@ export default class Drinks extends Vue {
 
 .inputs-container {
   grid-area: table;
+  border-right: 1px solid #b5b5b5;
 }
 
 .charts-container {

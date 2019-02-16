@@ -3,12 +3,16 @@
     <div class="inputs-container">
       <inputs
         :days="days"
+        :columns="inputColumns"
         @updateCaloriesOut="updateCaloriesOut"
         @updateCaloriesIn="updateCaloriesIn"
       />
+      <div class="total">
+        Total: {{totalCalories}} C | {{totalPounds}} lbs
+      </div>
     </div>
     <div class="charts-container">
-      <my-chart :days="days" />
+      <calories-chart :days="days" />
     </div>
   </div>
 </template>
@@ -17,8 +21,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs from './Inputs.vue'
-import MyChart from './MyChart.vue'
-import { Days, Day, attemptParseInt } from '../lib/day'
+import CaloriesChart from './CaloriesChart.vue'
+import { Day, attemptParseInt, net } from '../lib/day'
+import { Column } from '../lib/column'
 import api from '../lib/api'
 
 const BMR = 2000
@@ -26,11 +31,11 @@ const BMR = 2000
 @Component({
   components: {
     Inputs,
-    MyChart
+    CaloriesChart
   }
 })
 export default class Calories extends Vue {
-  days: Days
+  days: Day[]
   loading = true
 
   constructor () {
@@ -53,6 +58,39 @@ export default class Calories extends Vue {
 
   get bmr () {
     return BMR
+  }
+
+  get inputColumns (): Column[] {
+    return [
+      {
+        title: 'BMR',
+        value: () => BMR
+      },
+      {
+        title: 'Out',
+        value: (day) => day.caloriesOut,
+        inputEvent: 'updateCaloriesOut'
+      },
+      {
+        title: 'In',
+        value: (day) => day.caloriesIn,
+        inputEvent: 'updateCaloriesIn'
+      },
+      {
+        title: 'Net',
+        value: (day) => net(day)
+      }
+    ]
+  }
+
+  get totalCalories (): number {
+    return this.days.reduce((sum, day) => {
+      return sum + (net(day) || 0)
+    }, 0)
+  }
+
+  get totalPounds (): number {
+    return Math.round(this.totalCalories * 100 / 3500) / 100
   }
 
   async mounted () {
@@ -140,9 +178,17 @@ export default class Calories extends Vue {
 
 .inputs-container {
   grid-area: table;
+  border-right: 1px solid #b5b5b5;
 }
 
 .charts-container {
   grid-area: chart;
+}
+
+.total {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: right;
 }
 </style>

@@ -6,7 +6,6 @@ export type Day = {
   milesRun: any,
   drinks: any
 }
-export type Days = Day[]
 
 export function net (day: Day): number | null {
   if (!isNumber(day.caloriesOut) && !isNumber(day.caloriesIn)) {
