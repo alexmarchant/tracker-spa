@@ -8,16 +8,20 @@ import Chart from 'chart.js'
 import { Day, net } from '../lib/day'
 
 @Component
-export default class DrinksChart extends Vue {
+export default class Charts extends Vue {
   @Prop()
-  public days!: Day[]
+  days!: Day[]
+  @Prop()
+  actualData!: any[]
+  @Prop()
+  goalData!: any[]
+  chart!: Chart
 
-  @Watch('days', { deep: true })
-  onDaysChanged (val: Day[], oldVal: Day[]) {
+  @Watch('actualData', { deep: true })
+  @Watch('goalData', { deep: true })
+  onDataChanged (val: Day[], oldVal: Day[]) {
     this.recalculateChart()
   }
-
-  chart!: Chart
 
   get context (): CanvasRenderingContext2D {
     return (this.$refs.canvas as HTMLCanvasElement).getContext('2d')!
@@ -25,32 +29,6 @@ export default class DrinksChart extends Vue {
 
   get labels (): string[] {
     return this.days.map((day, index) => (index + 1).toString())
-  }
-
-  get goalData (): number[] {
-    let total = 0
-    return [
-      0, 0, 0,
-      0, 0, 0, 0, 4, 4, 0,
-      0, 0, 0, 0, 4, 4, 0,
-      0, 0, 0, 0, 4, 4, 0,
-      0, 0, 0, 0
-    ].map(drinks => {
-      total += (drinks || 0)
-      return total
-    })
-  }
-
-  get actualData (): any[] {
-    let total = 0
-    return this.days.map(day => {
-      if (day.drinks !== undefined && day.drinks !== null) {
-        total += day.drinks
-        return total
-      } else {
-        return null
-      }
-    })
   }
 
   mounted () {
@@ -86,6 +64,7 @@ export default class DrinksChart extends Vue {
 
   recalculateChart () {
     this.chart.data.datasets![0].data = this.actualData
+    this.chart.data.datasets![1].data = this.goalData
     this.chart.update()
   }
 }

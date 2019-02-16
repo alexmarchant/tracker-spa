@@ -8,7 +8,11 @@
       />
     </div>
     <div class="charts-container">
-      <running-chart :days="days" />
+      <charts
+        :days="days"
+        :actual-data="actualData"
+        :goal-data="goalData"
+      />
     </div>
   </div>
 </template>
@@ -16,8 +20,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import Inputs from './RunningInputs.vue'
-import RunningChart from './RunningChart.vue'
+import Inputs, { InputColumn } from './Inputs.vue'
+import Charts from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
@@ -26,7 +30,7 @@ const BMR = 2000
 @Component({
   components: {
     Inputs,
-    RunningChart
+    Charts
   }
 })
 export default class Calories extends Vue {
@@ -51,7 +55,7 @@ export default class Calories extends Vue {
     }
   }
 
-  get inputColumns (): Column[] {
+  get inputColumns (): InputColumn[] {
     return [
       {
         title: 'Miles Run',
@@ -59,6 +63,32 @@ export default class Calories extends Vue {
         inputEvent: 'updateMilesRun'
       }
     ]
+  }
+
+  get goalData (): number[] {
+    let total = 0
+    return [
+      null, null, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2, null, 4, null,
+      null, 2, 2, 2
+    ].map(miles => {
+      total += (miles || 0)
+      return total
+    })
+  }
+
+  get actualData (): any[] {
+    let total = 0
+    return this.days.map(day => {
+      if (day.milesRun !== undefined && day.milesRun !== null) {
+        total += day.milesRun
+        return total
+      } else {
+        return null
+      }
+    })
   }
 
   async mounted () {

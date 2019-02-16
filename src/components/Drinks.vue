@@ -8,7 +8,11 @@
       />
     </div>
     <div class="charts-container">
-      <drinks-chart :days="days" />
+      <charts
+        :days="days"
+        :actualData="actualData"
+        :goalData="goalData"
+      />
     </div>
   </div>
 </template>
@@ -16,8 +20,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import Inputs from './Inputs.vue'
-import DrinksChart from './DrinksChart.vue'
+import Inputs, { InputColumn } from './Inputs.vue'
+import Charts from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
@@ -26,7 +30,7 @@ const BMR = 2000
 @Component({
   components: {
     Inputs,
-    DrinksChart
+    Charts
   }
 })
 export default class Drinks extends Vue {
@@ -51,7 +55,7 @@ export default class Drinks extends Vue {
     }
   }
 
-  get inputColumns (): Column[] {
+  get inputColumns (): InputColumn[] {
     return [
       {
         title: 'Drinks',
@@ -59,6 +63,32 @@ export default class Drinks extends Vue {
         inputEvent: 'updateDrinks'
       }
     ]
+  }
+
+  get goalData (): number[] {
+    let total = 0
+    return [
+      0, 0, 0,
+      0, 0, 0, 0, 4, 4, 0,
+      0, 0, 0, 0, 4, 4, 0,
+      0, 0, 0, 0, 4, 4, 0,
+      0, 0, 0, 0
+    ].map(drinks => {
+      total += (drinks || 0)
+      return total
+    })
+  }
+
+  get actualData (): any[] {
+    let total = 0
+    return this.days.map(day => {
+      if (day.drinks !== undefined && day.drinks !== null) {
+        total += day.drinks
+        return total
+      } else {
+        return null
+      }
+    })
   }
 
   async mounted () {

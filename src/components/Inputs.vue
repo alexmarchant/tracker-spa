@@ -50,14 +50,19 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { Day, net } from '../lib/day'
 import { format } from 'date-fns'
-import { Column } from '../lib/column'
+
+export type InputColumn = {
+  title: string
+  value: (day: Day) => any
+  inputEvent?: string
+}
 
 @Component
 export default class Inputs extends Vue {
   @Prop()
   public days!: Day[]
   @Prop()
-  public columns!: Column[]
+  public columns!: InputColumn[]
 
   invalid (drinks: string): boolean {
     return isNaN(drinks as any)

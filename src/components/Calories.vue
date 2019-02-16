@@ -12,7 +12,11 @@
       </div>
     </div>
     <div class="charts-container">
-      <calories-chart :days="days" />
+      <charts
+        :days="days"
+        :actual-data="actualData"
+        :goal-data="goalData"
+      />
     </div>
   </div>
 </template>
@@ -20,10 +24,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import Inputs from './Inputs.vue'
-import CaloriesChart from './CaloriesChart.vue'
+import Inputs, { InputColumn } from './Inputs.vue'
+import Charts from './Charts.vue'
 import { Day, attemptParseInt, net } from '../lib/day'
-import { Column } from '../lib/column'
 import api from '../lib/api'
 
 const BMR = 2000
@@ -31,7 +34,7 @@ const BMR = 2000
 @Component({
   components: {
     Inputs,
-    CaloriesChart
+    Charts
   }
 })
 export default class Calories extends Vue {
@@ -60,7 +63,7 @@ export default class Calories extends Vue {
     return BMR
   }
 
-  get inputColumns (): Column[] {
+  get inputColumns (): InputColumn[] {
     return [
       {
         title: 'BMR',
@@ -91,6 +94,25 @@ export default class Calories extends Vue {
 
   get totalPounds (): number {
     return Math.round(this.totalCalories * 100 / 3500) / 100
+  }
+
+  get actualData (): any[] {
+    let total = 0
+    return this.days.map(day => {
+      const dayNet = net(day)
+      if (dayNet) {
+        total += dayNet
+        return total
+      } else {
+        return null
+      }
+    })
+  }
+
+  get goalData (): any[] {
+    return this.days.map((day, i) => {
+      return (i + 1) * -500
+    })
   }
 
   async mounted () {
