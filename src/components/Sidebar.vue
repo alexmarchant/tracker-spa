@@ -6,6 +6,9 @@
     <div class="link">
       <router-link to="running">R</router-link>
     </div>
+    <div class="link">
+      <router-link to="drinks">D</router-link>
+    </div>
   </div>
 </template>
 

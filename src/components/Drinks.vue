@@ -1,14 +1,13 @@
 <template>
   <div class="calories">
     <div class="inputs-container">
-      <inputs
+      <drinks-inputs
         :days="days"
-        @updateCaloriesOut="updateCaloriesOut"
-        @updateCaloriesIn="updateCaloriesIn"
+        @updateDrinks="updateDrinks"
       />
     </div>
     <div class="charts-container">
-      <my-chart :days="days" />
+      <drinks-chart :days="days" />
     </div>
   </div>
 </template>
@@ -16,8 +15,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import Inputs from './Inputs.vue'
-import MyChart from './MyChart.vue'
+import DrinksInputs from './DrinksInputs.vue'
+import DrinksChart from './DrinksChart.vue'
 import { Days, Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 
@@ -25,11 +24,11 @@ const BMR = 2000
 
 @Component({
   components: {
-    Inputs,
-    MyChart
+    DrinksInputs,
+    DrinksChart
   }
 })
-export default class Calories extends Vue {
+export default class Drinks extends Vue {
   days: Days
   loading = true
 
@@ -72,14 +71,8 @@ export default class Calories extends Vue {
           day.date.getMonth() === resDate.getMonth() &&
           day.date.getDate() === resDate.getDate()
         ) {
-          if (resDay.bmr !== undefined) {
-            day.bmr = resDay.bmr
-          }
-          if (resDay.caloriesIn !== undefined) {
-            day.caloriesIn = resDay.caloriesIn
-          }
-          if (resDay.caloriesOut !== undefined) {
-            day.caloriesOut = resDay.caloriesOut
+          if (resDay.drinks !== undefined) {
+            day.drinks = resDay.drinks
           }
         }
       })
@@ -88,37 +81,15 @@ export default class Calories extends Vue {
     this.loading = false
   }
 
-  updateCaloriesOut (index: number, calories: string) {
-    const processedCalories = attemptParseInt(calories)
+  async updateDrinks (index: number, drinks: string) {
+    const processedDrinks = attemptParseInt(drinks)
     const day = this.days[index]
-    day.caloriesOut = processedCalories
-    this.apiUpdateDay(
-      day.date,
-      BMR,
-      day.caloriesIn,
-      day.caloriesOut
-    )
-  }
+    day.drinks = processedDrinks
 
-  updateCaloriesIn (index: number, calories: string) {
-    const processedCalories = attemptParseInt(calories)
-    const day = this.days[index]
-    day.caloriesIn = processedCalories
-    this.apiUpdateDay(
-      day.date,
-      BMR,
-      day.caloriesIn,
-      day.caloriesOut
-    )
-  }
-
-  async apiUpdateDay (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
     try {
-      await api.days.updateCalories(
-        date,
-        bmr,
-        caloriesIn,
-        caloriesOut
+      await api.days.updateDrinks(
+        day.date,
+        day.drinks
       )
     } catch (err) {
       console.error(err)

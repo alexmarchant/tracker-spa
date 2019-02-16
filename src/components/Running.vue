@@ -44,7 +44,8 @@ export default class Calories extends Vue {
         bmr: BMR,
         caloriesIn: null,
         caloriesOut: null,
-        milesRun: null
+        milesRun: null,
+        drinks: null
       })
     }
   }

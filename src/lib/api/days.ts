@@ -22,6 +22,15 @@ export async function updateMilesRun (date: Date, milesRun: number | null): Prom
   })
 }
 
+export async function updateDrinks (date: Date, drinks: number | null): Promise<Response> {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return patch(`/days/${year}/${month}/${day}`, {
+    drinks
+  })
+}
+
 export async function index (date: Date): Promise<Days> {
   const res = await get(`/days/${date.getFullYear()}/${date.getMonth() + 1}`)
   const data = await res.json()

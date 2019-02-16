@@ -4,6 +4,7 @@ export type Day = {
   caloriesIn: any,
   caloriesOut: any,
   milesRun: any,
+  drinks: any
 }
 export type Days = Day[]
 
