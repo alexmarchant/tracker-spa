@@ -1,87 +1,68 @@
 <template>
-  <div class="calories">
-    <div class="inputs-container">
+  <dashboard>
+    <template v-slot:inputs>
       <inputs
         :days="days"
         :columns="inputColumns"
-        @updateCaloriesOut="updateCaloriesOut"
-        @updateCaloriesIn="updateCaloriesIn"
+        @update="update"
       />
       <div class="total">
         Total: {{totalCalories}} C | {{totalPounds}} lbs
       </div>
-    </div>
-    <div class="charts-container">
+    </template>
+    <template v-slot:charts>
       <charts
         :days="days"
         :actual-data="actualData"
         :goal-data="goalData"
       />
-    </div>
-  </div>
+    </template>
+  </dashboard>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs, { InputColumn } from './Inputs.vue'
 import Charts from './Charts.vue'
 import { Day, attemptParseInt, net } from '../lib/day'
 import api from '../lib/api'
+import Dashboard from './Dashboard.vue'
 
 const BMR = 2000
 
 @Component({
   components: {
+    Dashboard,
     Inputs,
     Charts
   }
 })
 export default class Calories extends Vue {
-  days: Day[]
-  loading = true
-
-  constructor () {
-    super()
-    const dayCount = getDaysInMonth(new Date())
-    this.days = []
-    for (let i = 1; i <= dayCount; i++) {
-      const today = new Date()
-      const date = parse(`${today.getFullYear()}-${today.getMonth() + 1}-${i}`)
-      this.days.push({
-        date,
-        bmr: BMR,
-        caloriesIn: null,
-        caloriesOut: null,
-        milesRun: null,
-        drinks: null
-      })
-    }
-  }
-
-  get bmr () {
-    return BMR
-  }
+  @Prop()
+  days!: Day[]
 
   get inputColumns (): InputColumn[] {
     return [
       {
         title: 'BMR',
         value: () => BMR
-      },
-      {
+      }, {
         title: 'Out',
         value: (day) => day.caloriesOut,
-        inputEvent: 'updateCaloriesOut'
-      },
-      {
+        updateKey: 'caloriesOut'
+      }, {
         title: 'In',
         value: (day) => day.caloriesIn,
-        inputEvent: 'updateCaloriesIn'
-      },
-      {
+        updateKey: 'caloriesIn'
+      }, {
         title: 'Net',
         value: (day) => net(day)
+      }, {
+        title: 'Goal',
+        value: (day) => day.caloriesGoal,
+        updateKey: 'caloriesGoal',
+        alwaysEnabled: true
       }
     ]
   }
@@ -110,103 +91,30 @@ export default class Calories extends Vue {
   }
 
   get goalData (): any[] {
-    return this.days.map((day, i) => {
-      return (i + 1) * -500
+    let total = 0
+    return this.days.map(day => {
+      if (day.caloriesGoal !== undefined && day.caloriesGoal !== null) {
+        total += day.caloriesGoal
+        return total
+      } else {
+        return null
+      }
     })
   }
 
-  async mounted () {
-    let days
-    try {
-      days = await api.days.index(new Date())
-    } catch (err) {
-      console.error(err)
-      return
-    }
+  async update (updateKey: string, index: number, value: string) {
+    const processedValue = attemptParseInt(value)
+    const day = this.days[index];
+    (day as any)[updateKey] = processedValue
 
-    days.forEach(resDay => {
-      const resDate = parse(resDay.date)
-      this.days.forEach(day => {
-        if (
-          day.date.getFullYear() === resDate.getFullYear() &&
-          day.date.getMonth() === resDate.getMonth() &&
-          day.date.getDate() === resDate.getDate()
-        ) {
-          if (resDay.bmr !== undefined) {
-            day.bmr = resDay.bmr
-          }
-          if (resDay.caloriesIn !== undefined) {
-            day.caloriesIn = resDay.caloriesIn
-          }
-          if (resDay.caloriesOut !== undefined) {
-            day.caloriesOut = resDay.caloriesOut
-          }
-        }
-      })
+    api.days.update(day.date, {
+      [updateKey]: processedValue
     })
-
-    this.loading = false
-  }
-
-  updateCaloriesOut (index: number, calories: string) {
-    const processedCalories = attemptParseInt(calories)
-    const day = this.days[index]
-    day.caloriesOut = processedCalories
-    this.apiUpdateDay(
-      day.date,
-      BMR,
-      day.caloriesIn,
-      day.caloriesOut
-    )
-  }
-
-  updateCaloriesIn (index: number, calories: string) {
-    const processedCalories = attemptParseInt(calories)
-    const day = this.days[index]
-    day.caloriesIn = processedCalories
-    this.apiUpdateDay(
-      day.date,
-      BMR,
-      day.caloriesIn,
-      day.caloriesOut
-    )
-  }
-
-  async apiUpdateDay (date: Date, bmr: number | null, caloriesIn: number | null, caloriesOut: number | null) {
-    try {
-      await api.days.updateCalories(
-        date,
-        bmr,
-        caloriesIn,
-        caloriesOut
-      )
-    } catch (err) {
-      console.error(err)
-    }
   }
 }
 </script>
 
 <style scoped>
-.calories {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  grid-template-rows: auto;
-  grid-template-areas:
-    "table chart"
-  ;
-  height: 100%;
-}
-
-.inputs-container {
-  grid-area: table;
-  border-right: 1px solid #b5b5b5;
-}
-
-.charts-container {
-  grid-area: chart;
-}
-
 .total {
   padding: 10px;
   font-size: 14px;

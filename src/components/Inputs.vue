@@ -29,11 +29,11 @@
             :key="colI"
             :style="{ width: `${columnWidth}%` }"
           >
-            <template v-if="column.inputEvent">
+            <template v-if="column.updateKey">
               <input
-                @input="$emit(column.inputEvent, rowI, $event.target.value)"
+                @input="$emit('update', column.updateKey, rowI, $event.target.value)"
                 :value="column.value(day)"
-                :disabled="futureDay(day)"
+                :disabled="futureDay(day) && !column.alwaysEnabled"
               >
             </template>
             <template v-else>
@@ -54,7 +54,8 @@ import { format } from 'date-fns'
 export type InputColumn = {
   title: string
   value: (day: Day) => any
-  inputEvent?: string
+  updateKey?: string
+  alwaysEnabled?: boolean
 }
 
 @Component

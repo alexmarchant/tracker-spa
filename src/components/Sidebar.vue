@@ -1,14 +1,8 @@
 <template>
   <div class="sidebar">
-    <div class="link">
-      <router-link to="/">C</router-link>
-    </div>
-    <div class="link">
-      <router-link to="running">R</router-link>
-    </div>
-    <div class="link">
-      <router-link to="drinks">D</router-link>
-    </div>
+    <router-link to="/">C</router-link>
+    <router-link to="running">R</router-link>
+    <router-link to="drinks">D</router-link>
   </div>
 </template>
 
@@ -30,27 +24,23 @@ export default class Sidebar extends Vue {
   align-items: center;
 }
 
-.link {
+a {
+  display: block;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.85);
   border-radius: 50%;
   height: 30px;
   width: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #001950;
+  font-size: 20px;
+  line-height: 30px;
+  text-decoration: none;
+  font-weight: bold;
   margin-bottom: 10px;
 }
 
-.link:hover,
-.link.active {
+a:hover,
+a.router-link-exact-active {
   background-color: rgba(255, 255, 255, 1);
-}
-
-a {
-  color: #001950;
-  font-size: 20px;
-  text-decoration: none;
-  font-weight: bold;
 }
 </style>

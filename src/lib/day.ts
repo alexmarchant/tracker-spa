@@ -1,10 +1,13 @@
 export type Day = {
-  date: Date,
-  bmr: number,
-  caloriesIn: any,
-  caloriesOut: any,
-  milesRun: any,
-  drinks: any
+  date: Date
+  bmr: number
+  caloriesIn?: any
+  caloriesOut?: any
+  caloriesGoal?: any
+  milesRun?: any
+  milesRunGoal?: any
+  drinks?: any
+  drinksGoal?: any
 }
 
 export function net (day: Day): number | null {
@@ -32,4 +35,18 @@ function isNumber (value: any): boolean {
     return false
   }
   return !isNaN(value)
+}
+
+export function emptyDay (date: Date, BMR: number): Day {
+  return {
+    date,
+    bmr: BMR,
+    caloriesIn: null,
+    caloriesOut: null,
+    caloriesGoal: null,
+    milesRun: null,
+    milesRunGoal: null,
+    drinks: null,
+    drinksGoal: null
+  }
 }

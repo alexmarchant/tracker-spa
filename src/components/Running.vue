@@ -1,82 +1,55 @@
 <template>
-  <div class="calories">
-    <div class="inputs-container">
+  <dashboard>
+    <template v-slot:inputs>
       <inputs
         :days="days"
         :columns="inputColumns"
-        @updateMilesRun="updateMilesRun"
+        @update="update"
       />
-    </div>
-    <div class="charts-container">
+    </template>
+    <template v-slot:charts>
       <charts
         :days="days"
         :actual-data="actualData"
         :goal-data="goalData"
       />
-    </div>
-  </div>
+    </template>
+  </dashboard>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs, { InputColumn } from './Inputs.vue'
 import Charts from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
-
-const BMR = 2000
+import Dashboard from './Dashboard.vue'
 
 @Component({
   components: {
+    Dashboard,
     Inputs,
     Charts
   }
 })
 export default class Calories extends Vue {
-  days: Day[]
-  loading = true
-
-  constructor () {
-    super()
-    const dayCount = getDaysInMonth(new Date())
-    this.days = []
-    for (let i = 1; i <= dayCount; i++) {
-      const today = new Date()
-      const date = parse(`${today.getFullYear()}-${today.getMonth() + 1}-${i}`)
-      this.days.push({
-        date,
-        bmr: BMR,
-        caloriesIn: null,
-        caloriesOut: null,
-        milesRun: null,
-        drinks: null
-      })
-    }
-  }
+  @Prop()
+  days!: Day[]
 
   get inputColumns (): InputColumn[] {
     return [
       {
         title: 'Miles Run',
         value: (day) => day.milesRun,
-        inputEvent: 'updateMilesRun'
+        updateKey: 'milesRun'
+      }, {
+        title: 'Goal',
+        value: (day) => day.milesRunGoal,
+        updateKey: 'milesRunGoal',
+        alwaysEnabled: true
       }
     ]
-  }
-
-  get goalData (): number[] {
-    let total = 0
-    return [
-      null, null, null,
-      null, 2, 2, 2, null, 4, null,
-      null, 2, 2, 2, null, 4, null,
-      null, 2, 2, 2, null, 4, null,
-      null, 2, 2, 2
-    ].map(miles => {
-      total += (miles || 0)
-      return total
-    })
   }
 
   get actualData (): any[] {
@@ -91,67 +64,29 @@ export default class Calories extends Vue {
     })
   }
 
-  async mounted () {
-    let days
-    try {
-      days = await api.days.index(new Date())
-    } catch (err) {
-      console.error(err)
-      return
-    }
-
-    days.forEach(resDay => {
-      const resDate = parse(resDay.date)
-      this.days.forEach(day => {
-        if (
-          day.date.getFullYear() === resDate.getFullYear() &&
-          day.date.getMonth() === resDate.getMonth() &&
-          day.date.getDate() === resDate.getDate()
-        ) {
-          if (resDay.milesRun !== undefined) {
-            day.milesRun = resDay.milesRun
-          }
-        }
-      })
+  get goalData (): any[] {
+    let total = 0
+    return this.days.map(day => {
+      if (day.milesRunGoal !== undefined && day.milesRunGoal !== null) {
+        total += day.milesRunGoal
+        return total
+      } else {
+        return null
+      }
     })
-
-    this.loading = false
   }
 
-  async updateMilesRun (index: number, milesRun: string) {
-    const processedMilesRun = attemptParseInt(milesRun)
-    const day = this.days[index]
-    day.milesRun = processedMilesRun
+  async update (updateKey: string, index: number, value: string) {
+    const processedValue = attemptParseInt(value)
+    const day = this.days[index];
+    (day as any)[updateKey] = processedValue
 
-    try {
-      await api.days.updateMilesRun(
-        day.date,
-        day.milesRun
-      )
-    } catch (err) {
-      console.error(err)
-    }
+    api.days.update(day.date, {
+      [updateKey]: processedValue
+    })
   }
 }
 </script>
 
 <style scoped>
-.calories {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  grid-template-rows: auto;
-  grid-template-areas:
-    "table chart"
-  ;
-  height: 100%;
-}
-
-.inputs-container {
-  grid-area: table;
-  border-right: 1px solid #b5b5b5;
-}
-
-.charts-container {
-  grid-area: chart;
-}
 </style>
