@@ -2,7 +2,7 @@
   <dashboard
     :inputColumns="inputColumns"
     :actual-chart-data="actualData"
-    :goal-chart-data="actualData"
+    :goal-chart-data="goalData"
     :total="total"
   />
 </template>
