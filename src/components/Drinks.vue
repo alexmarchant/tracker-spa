@@ -1,25 +1,13 @@
 <template>
-  <dashboard>
-    <template v-slot:inputs>
-      <inputs
-        :days="days"
-        :columns="inputColumns"
-        @update="update"
-      />
-    </template>
-    <template v-slot:charts>
-      <charts
-        :days="days"
-        :actualData="actualData"
-        :goalData="goalData"
-      />
-    </template>
-  </dashboard>
+  <dashboard
+    :inputColumns="inputColumns"
+    :actual-chart-data="actualData"
+    :goal-chart-data="goalData"
+  />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-import { getDaysInMonth, parse } from 'date-fns'
 import Inputs, { InputColumn } from './Inputs.vue'
 import Charts from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
@@ -34,9 +22,6 @@ import Dashboard from './Dashboard.vue'
   }
 })
 export default class Drinks extends Vue {
-  @Prop()
-  days!: Day[]
-
   get inputColumns (): InputColumn[] {
     return [
       {
@@ -54,7 +39,7 @@ export default class Drinks extends Vue {
 
   get actualData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       if (day.drinks !== undefined && day.drinks !== null) {
         total += day.drinks
         return total
@@ -66,7 +51,7 @@ export default class Drinks extends Vue {
 
   get goalData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       if (day.drinksGoal !== undefined && day.drinksGoal !== null) {
         total += day.drinksGoal
         return total
@@ -78,7 +63,7 @@ export default class Drinks extends Vue {
 
   async update (updateKey: string, index: number, value: string) {
     const processedValue = attemptParseInt(value)
-    const day = this.days[index];
+    const day = this.$store.state.days[index];
     (day as any)[updateKey] = processedValue
 
     api.days.update(day.date, {

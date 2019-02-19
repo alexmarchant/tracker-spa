@@ -25,7 +25,7 @@
           </td>
           <td
             v-for="(column, colI) in columns"
-            :class="{ 'input-cell': column.inputEvent }"
+            :class="{ 'input-cell': column.updateKey }"
             :key="colI"
             :style="{ width: `${columnWidth}%` }"
           >
@@ -61,8 +61,6 @@ export type InputColumn = {
 @Component
 export default class Inputs extends Vue {
   @Prop()
-  public days!: Day[]
-  @Prop()
   public columns!: InputColumn[]
 
   invalid (drinks: string): boolean {
@@ -83,6 +81,10 @@ export default class Inputs extends Vue {
 
   get columnWidth (): number {
     return (100 - this.dayWidth) / this.columns.length
+  }
+
+  get days (): Day[] {
+    return this.$store.state.days
   }
 }
 </script>

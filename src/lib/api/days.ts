@@ -1,4 +1,4 @@
-import { Day } from '../day'
+import { Day, parseDay } from '../day'
 import { get, patch } from './helpers'
 import store from '../store'
 
@@ -16,7 +16,7 @@ type UpdateDayPayload = {
 export async function index (date: Date): Promise<Day[]> {
   const res = await get(`/days/${date.getFullYear()}/${date.getMonth() + 1}`)
   const data = await res.json()
-  return data.days
+  return data.days.map((day: any) => parseDay(day))
 }
 
 export async function update (date: Date, payload: UpdateDayPayload): Promise<Response> {

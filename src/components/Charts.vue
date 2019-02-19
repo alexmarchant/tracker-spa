@@ -10,8 +10,6 @@ import { Day, net } from '../lib/day'
 @Component
 export default class Charts extends Vue {
   @Prop()
-  days!: Day[]
-  @Prop()
   actualData!: any[]
   @Prop()
   goalData!: any[]
@@ -28,7 +26,7 @@ export default class Charts extends Vue {
   }
 
   get labels (): string[] {
-    return this.days.map((day, index) => (index + 1).toString())
+    return this.$store.state.days.map((day: Day, index: number) => (index + 1).toString())
   }
 
   mounted () {
@@ -63,6 +61,7 @@ export default class Charts extends Vue {
   }
 
   recalculateChart () {
+    if (!this.chart) return
     this.chart.data.datasets![0].data = this.actualData
     this.chart.data.datasets![1].data = this.goalData
     this.chart.update()

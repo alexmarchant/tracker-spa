@@ -1,23 +1,10 @@
 <template>
-  <dashboard>
-    <template v-slot:inputs>
-      <inputs
-        :days="days"
-        :columns="inputColumns"
-        @update="update"
-      />
-      <div class="total">
-        Total: {{totalCalories}} C | {{totalPounds}} lbs
-      </div>
-    </template>
-    <template v-slot:charts>
-      <charts
-        :days="days"
-        :actual-data="actualData"
-        :goal-data="goalData"
-      />
-    </template>
-  </dashboard>
+  <dashboard
+    :inputColumns="inputColumns"
+    :actual-chart-data="actualData"
+    :goal-chart-data="actualData"
+    :total="total"
+  />
 </template>
 
 <script lang="ts">
@@ -39,9 +26,6 @@ const BMR = 2000
   }
 })
 export default class Calories extends Vue {
-  @Prop()
-  days!: Day[]
-
   get inputColumns (): InputColumn[] {
     return [
       {
@@ -68,7 +52,7 @@ export default class Calories extends Vue {
   }
 
   get totalCalories (): number {
-    return this.days.reduce((sum, day) => {
+    return this.$store.state.days.reduce((sum: number, day: Day) => {
       return sum + (net(day) || 0)
     }, 0)
   }
@@ -79,7 +63,7 @@ export default class Calories extends Vue {
 
   get actualData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       const dayNet = net(day)
       if (dayNet) {
         total += dayNet
@@ -92,7 +76,7 @@ export default class Calories extends Vue {
 
   get goalData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       if (day.caloriesGoal !== undefined && day.caloriesGoal !== null) {
         total += day.caloriesGoal
         return total
@@ -102,9 +86,13 @@ export default class Calories extends Vue {
     })
   }
 
+  get total (): string {
+    return `Total: ${this.totalCalories} C | ${this.totalPounds} lbs`
+  }
+
   async update (updateKey: string, index: number, value: string) {
     const processedValue = attemptParseInt(value)
-    const day = this.days[index];
+    const day = this.$store.state.days[index];
     (day as any)[updateKey] = processedValue
 
     api.days.update(day.date, {
@@ -113,12 +101,3 @@ export default class Calories extends Vue {
   }
 }
 </script>
-
-<style scoped>
-.total {
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: right;
-}
-</style>

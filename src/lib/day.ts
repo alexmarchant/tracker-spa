@@ -1,3 +1,7 @@
+import { parse } from 'date-fns'
+
+const BMR = 2000
+
 export type Day = {
   date: Date
   bmr: number
@@ -37,7 +41,7 @@ function isNumber (value: any): boolean {
   return !isNaN(value)
 }
 
-export function emptyDay (date: Date, BMR: number): Day {
+export function emptyDay (date: Date): Day {
   return {
     date,
     bmr: BMR,
@@ -49,4 +53,9 @@ export function emptyDay (date: Date, BMR: number): Day {
     drinks: null,
     drinksGoal: null
   }
+}
+
+export function parseDay (obj: any): Day {
+  obj.date = parse(obj.date.split('T')[0])
+  return obj as Day
 }

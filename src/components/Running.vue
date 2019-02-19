@@ -1,36 +1,22 @@
 <template>
-  <dashboard>
-    <template v-slot:inputs>
-      <inputs
-        :days="days"
-        :columns="inputColumns"
-        @update="update"
-      />
-    </template>
-    <template v-slot:charts>
-      <charts
-        :days="days"
-        :actual-data="actualData"
-        :goal-data="goalData"
-      />
-    </template>
-  </dashboard>
+  <dashboard
+    :inputColumns="inputColumns"
+    :actual-chart-data="actualData"
+    :goal-chart-data="goalData"
+  />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
-import Inputs, { InputColumn } from './Inputs.vue'
-import Charts from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
+import { InputColumn } from './Inputs.vue'
 import api from '../lib/api'
 import Dashboard from './Dashboard.vue'
 
 @Component({
   components: {
-    Dashboard,
-    Inputs,
-    Charts
+    Dashboard
   }
 })
 export default class Calories extends Vue {
@@ -54,7 +40,7 @@ export default class Calories extends Vue {
 
   get actualData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       if (day.milesRun !== undefined && day.milesRun !== null) {
         total += day.milesRun
         return total
@@ -66,23 +52,13 @@ export default class Calories extends Vue {
 
   get goalData (): any[] {
     let total = 0
-    return this.days.map(day => {
+    return this.$store.state.days.map((day: Day) => {
       if (day.milesRunGoal !== undefined && day.milesRunGoal !== null) {
         total += day.milesRunGoal
         return total
       } else {
         return null
       }
-    })
-  }
-
-  async update (updateKey: string, index: number, value: string) {
-    const processedValue = attemptParseInt(value)
-    const day = this.days[index];
-    (day as any)[updateKey] = processedValue
-
-    api.days.update(day.date, {
-      [updateKey]: processedValue
     })
   }
 }

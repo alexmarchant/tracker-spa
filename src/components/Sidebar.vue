@@ -1,15 +1,30 @@
 <template>
   <div class="sidebar">
-    <router-link to="/">C</router-link>
-    <router-link to="running">R</router-link>
-    <router-link to="drinks">D</router-link>
+    <router-link to="/">
+      <CaloriesIcon />
+    </router-link>
+    <router-link to="running">
+      <RunningIcon />
+    </router-link>
+    <router-link to="drinks">
+      <DrinksIcon />
+    </router-link>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import CaloriesIcon from '../images/burn-button.svg'
+import RunningIcon from '../images/runer-silhouette-running-fast.svg'
+import DrinksIcon from '../images/drink-beer-jar.svg'
 
-@Component
+@Component({
+  components: {
+    CaloriesIcon,
+    RunningIcon,
+    DrinksIcon
+  }
+})
 export default class Sidebar extends Vue {
 }
 </script>
@@ -25,10 +40,9 @@ export default class Sidebar extends Vue {
 }
 
 a {
-  display: block;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 30px;
   width: 30px;
   color: #001950;
@@ -39,8 +53,12 @@ a {
   margin-bottom: 10px;
 }
 
-a:hover,
-a.router-link-exact-active {
-  background-color: rgba(255, 255, 255, 1);
+a svg path {
+  fill: rgba(255, 255, 255, 0.6);
+}
+
+a:hover svg path,
+a.router-link-exact-active svg path {
+  fill: rgba(255, 255, 255, 1);
 }
 </style>
