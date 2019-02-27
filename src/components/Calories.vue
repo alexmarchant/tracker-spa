@@ -65,7 +65,7 @@ export default class Calories extends Vue {
     let total = 0
     return this.$store.state.days.map((day: Day) => {
       const dayNet = net(day)
-      if (dayNet) {
+      if (dayNet !== null) {
         total += dayNet
         return total
       } else {
