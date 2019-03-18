@@ -16,6 +16,7 @@ import Sidebar from './Sidebar.vue'
 import Auth from './Auth.vue'
 import { getToken } from '../lib/auth'
 import { getDaysInMonth, parse } from 'date-fns'
+import { Action } from 'vuex-class'
 
 @Component({
   components: {
@@ -24,6 +25,11 @@ import { getDaysInMonth, parse } from 'date-fns'
   }
 })
 export default class App extends Vue {
+  @Action
+  setToken!: (token: string) => void
+  @Action
+  loadDays!: () => void
+
   mounted () {
     this.checkAuth()
   }
@@ -32,7 +38,8 @@ export default class App extends Vue {
     const token = getToken()
 
     if (token) {
-      this.$store.commit('setToken', token)
+      this.setToken(token)
+      this.loadDays()
       return true
     }
 

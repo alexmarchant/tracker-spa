@@ -1,10 +1,7 @@
 <template>
   <div class="dashboard">
     <div class="inputs-container">
-      <inputs
-        :columns="inputColumns"
-        @update="update"
-      />
+      <inputs :columns="inputColumns" />
       <div v-if="total" class="total">
         {{total}}
       </div>
@@ -43,34 +40,6 @@ export default class Dashboard extends Vue {
   goalChartData!: any[]
   @Prop()
   total?: string
-
-  async mounted () {
-    await this.loadDays()
-  }
-
-  async loadDays () {
-    try {
-      const days = await api.days.index(new Date())
-      this.$store.commit('updateDays', days)
-    } catch (err) {
-      alert(err)
-    }
-  }
-
-  async update (updateKey: string, index: number, value: string) {
-    const processedValue = attemptParseInt(value)
-    const day = Object.assign({}, this.$store.state.days[index]);
-    (day as any)[updateKey] = processedValue
-    this.$store.commit('updateDays', [day])
-
-    try {
-      await api.days.update(day.date, {
-        [updateKey]: processedValue
-      })
-    } catch (err) {
-      alert(err)
-    }
-  }
 }
 </script>
 

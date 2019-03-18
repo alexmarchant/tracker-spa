@@ -1,15 +1,26 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
-import { parse, getDaysInMonth } from 'date-fns'
+import Vuex, { StoreOptions } from 'vuex'
+import {
+  parse,
+  getDaysInMonth,
+  subMonths,
+  addMonths
+} from 'date-fns'
 import { Day, emptyDay } from '../day'
 import cloneDeep from 'lodash.clonedeep'
+import api from '../api'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+export interface RootState {
+  token?: string,
+  days: Day[],
+}
+
+const store: StoreOptions<RootState> = {
   state: {
-    token: null,
-    days: initWithEmptyDays()
+    token: undefined,
+    days: initWithEmptyDays(new Date())
   },
   mutations: {
     setToken (state, token) {
@@ -17,17 +28,52 @@ export default new Vuex.Store({
     },
     updateDays (state, days) {
       state.days = updateDays(state.days, days)
+    },
+    goBackAMonth (state) {
+      const date = state.days[0].date
+      const res = subMonths(date, 1)
+      state.days = initWithEmptyDays(res)
+    },
+    goForwardAMonth (state) {
+      const date = state.days[0].date
+      const res = addMonths(date, 1)
+      state.days = initWithEmptyDays(res)
+    }
+  },
+  actions: {
+    setToken ({ commit }, token) {
+      commit('setToken', token)
+    },
+    updateDays ({ commit }, days) {
+      commit('updateDays', days)
+    },
+    goBackAMonth ({ commit, dispatch }) {
+      commit('goBackAMonth')
+      dispatch('loadDays')
+    },
+    goForwardAMonth ({ commit, dispatch }) {
+      commit('goForwardAMonth')
+      dispatch('loadDays')
+    },
+    loadDays: async function ({ commit, dispatch, state }) {
+      try {
+        const days = await api.days.index(state.days[0].date)
+        dispatch('updateDays', days)
+      } catch (err) {
+        alert(err)
+      }
     }
   }
-})
+}
 
-function initWithEmptyDays (): Day[] {
-  const dayCount = getDaysInMonth(new Date())
+export default new Vuex.Store<RootState>(store)
+
+function initWithEmptyDays (date: Date): Day[] {
+  const dayCount = getDaysInMonth(date)
   const days: Day[] = []
   for (let i = 1; i <= dayCount; i++) {
-    const today = new Date()
-    const date = parse(`${today.getFullYear()}-${today.getMonth() + 1}-${i}`)
-    days.push(emptyDay(date))
+    const thisDate = parse(`${date.getFullYear()}-${date.getMonth() + 1}-${i}`)
+    days.push(emptyDay(thisDate))
   }
   return days
 }

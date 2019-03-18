@@ -1,6 +1,12 @@
 <template>
   <div class="inputs">
-    <h2 class="month">{{month}}</h2>
+    <h2 class="month">
+      <span @click="goBack">&lt;&nbsp;&nbsp;</span>
+      {{month}}
+      <template v-if="canGoForward">
+        <span @click="goForward">&nbsp;&nbsp;&gt;</span>
+      </template>
+    </h2>
     <table>
       <thead>
         <tr>
@@ -31,7 +37,7 @@
           >
             <template v-if="column.updateKey">
               <input
-                @input="$emit('update', column.updateKey, rowI, $event.target.value)"
+                @input="update(column.updateKey, day, $event.target.value)"
                 :value="column.value(day)"
                 :disabled="futureDay(day) && !column.alwaysEnabled"
               >
@@ -47,9 +53,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-import { Day, net } from '../lib/day'
+import { Action } from 'vuex-class'
+import {
+  Component,
+  Vue,
+  Prop
+} from 'vue-property-decorator'
+import { Day, net, attemptParseInt } from '../lib/day'
 import { format } from 'date-fns'
+import api from '../lib/api'
 
 export type InputColumn = {
   title: string
@@ -62,6 +74,12 @@ export type InputColumn = {
 export default class Inputs extends Vue {
   @Prop()
   public columns!: InputColumn[]
+  @Action
+  updateDays!: (days: Day[]) => void
+  @Action
+  goBackAMonth!: () => void
+  @Action
+  goForwardAMonth!: () => void
 
   invalid (drinks: string): boolean {
     return isNaN(drinks as any)
@@ -71,8 +89,31 @@ export default class Inputs extends Vue {
     return day.date > new Date()
   }
 
+  goBack () {
+    this.goBackAMonth()
+  }
+
+  goForward () {
+    this.goForwardAMonth()
+  }
+
+  async update (updateKey: string, day: Day, value: string) {
+    day = Object.assign({}, day)
+    const processedValue = attemptParseInt(value);
+    (day as any)[updateKey] = processedValue
+    this.updateDays([day])
+
+    try {
+      await api.days.update(day.date, {
+        [updateKey]: processedValue
+      })
+    } catch (err) {
+      alert(err)
+    }
+  }
+
   get month (): string {
-    return format(new Date(), 'MMM YY')
+    return format(this.$store.state.days[0].date, 'MMM YY')
   }
 
   get dayWidth (): number {
@@ -86,6 +127,13 @@ export default class Inputs extends Vue {
   get days (): Day[] {
     return this.$store.state.days
   }
+
+  get canGoForward (): boolean {
+    const now = new Date()
+    const selectedDate = this.$store.state.days[0].date
+    return !(selectedDate.getFullYear() === now.getFullYear() &&
+      selectedDate.getMonth() === now.getMonth())
+  }
 }
 </script>
 
@@ -95,6 +143,10 @@ export default class Inputs extends Vue {
   font-size: 16px;
   margin: 0;
   padding: 10px 0;
+}
+
+.month span {
+  cursor: pointer;
 }
 
 table {

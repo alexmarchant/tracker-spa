@@ -14,9 +14,15 @@
 import { Component, Vue } from 'vue-property-decorator'
 import api from '../lib/api'
 import { saveToken } from '../lib/auth'
+import { Action } from 'vuex-class'
 
 @Component
 export default class App extends Vue {
+  @Action
+  setToken!: (token: string) => void
+  @Action
+  loadDays!: () => void
+
   email = ''
   password = ''
 
@@ -26,7 +32,8 @@ export default class App extends Vue {
     try {
       const token = await api.sessions.create(this.email, this.password)
       saveToken(token)
-      this.$store.commit('setToken', token)
+      this.setToken(token)
+      this.loadDays()
     } catch (e) {
       alert(e)
     }
