@@ -59,6 +59,14 @@ export default class Calories extends Vue {
         value: (day) => day.drinksGoal,
         updateKey: 'drinksGoal',
         alwaysEnabled: true
+      }, {
+        title: 'Mood',
+        value: (day) => day.mood,
+        updateKey: 'mood'
+      }, {
+        title: 'Energy',
+        value: (day) => day.energy,
+        updateKey: 'energy'
       }
     ]
   }

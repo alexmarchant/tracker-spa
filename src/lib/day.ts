@@ -12,6 +12,8 @@ export type Day = {
   milesRunGoal?: any
   drinks?: any
   drinksGoal?: any
+  mood?: any
+  energy?: any
 }
 
 export function net (day: Day): number | null {
