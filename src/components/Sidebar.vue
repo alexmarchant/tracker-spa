@@ -38,10 +38,16 @@ export default class Sidebar extends Vue {
 .sidebar {
   background-color: #001950;
   height: 100%;
-  padding-top: 10px;
+  padding-left: 10px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+}
+@media (min-width: 700px) {
+  .sidebar {
+    padding-top: 10px;
+    flex-direction: column;
+  }
 }
 
 a {
@@ -55,7 +61,12 @@ a {
   line-height: 30px;
   text-decoration: none;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-right: 10px;
+}
+@media (min-width: 700px) {
+  a {
+    margin-bottom: 10px;
+  }
 }
 
 a svg path {

@@ -46,12 +46,23 @@ export default class Dashboard extends Vue {
 <style scoped>
 .dashboard {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: auto;
   grid-template-rows: auto;
   grid-template-areas:
-    "table chart"
+    "chart"
+    "table"
   ;
   height: 100%;
+}
+
+@media (min-width: 700px) {
+  .dashboard {
+    grid-template-columns: 30% 70%;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "table chart"
+    ;
+  }
 }
 
 .inputs-container {

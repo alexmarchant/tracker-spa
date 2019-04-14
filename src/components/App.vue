@@ -71,12 +71,22 @@ body {
 <style scoped>
 .app {
   display: grid;
-  grid-template-columns: 50px auto;
-  grid-template-rows: auto;
+  grid-template-columns: auto;
+  grid-template-rows: 50px auto;
   grid-template-areas:
-    "sidebar content"
+    "sidebar"
+    "content"
   ;
   height: 100vh;
+}
+@media (min-width: 700px) {
+  .app {
+    grid-template-columns: 50px auto;
+    grid-template-rows: auto;
+    grid-template-areas:
+      "sidebar content"
+    ;
+  }
 }
 
 .sidebar-container {
