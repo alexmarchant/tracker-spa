@@ -32,4 +32,4 @@ build:
 release:
   stage: release
   script:
-    - kubectl --kubeconfig="kubeconfig.yml" patch deployment tracker-spa -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
+    - kubectl patch deployment tracker-spa -p "{\"spec\":{\"template\":{\"metadata\":{\"labels\":{\"date\":\"`date +'%s'`\"}}}}}"
