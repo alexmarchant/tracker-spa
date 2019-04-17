@@ -17,7 +17,7 @@ before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
   # Setup kubectl
   - echo $GCLOUD_AUTH | base64 --decode > gcloud-auth.json
-  - export GOOGLE_APPLICATION_CREDENTIALS="./gcloud-auth.json"
+  - gcloud auth activate-service-account --key-file ./gcloud-auth.json
   - gcloud container clusters get-credentials alexmarchant-com
 
 build:
