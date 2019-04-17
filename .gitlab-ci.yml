@@ -18,6 +18,7 @@ before_script:
   # Setup kubectl
   - echo $GCLOUD_AUTH | base64 --decode > gcloud-auth.json
   - gcloud auth activate-service-account --key-file ./gcloud-auth.json
+  - gcloud config set project websites-236502
   - gcloud container clusters get-credentials alexmarchant-com --zone us-central1-a
 
 build:
