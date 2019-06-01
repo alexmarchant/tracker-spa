@@ -1,8 +1,7 @@
 <template>
   <dashboard
     :inputColumns="inputColumns"
-    :actual-chart-data="actualData"
-    :goal-chart-data="goalData"
+    :chart-data="chartData"
   />
 </template>
 
@@ -11,6 +10,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import { Day, attemptParseInt } from '../lib/day'
 import { InputColumn } from './Inputs.vue'
+import { ChartDataSet } from './Charts.vue'
 import api from '../lib/api'
 import Dashboard from './Dashboard.vue'
 
@@ -34,6 +34,18 @@ export default class Calories extends Vue {
         value: (day) => day.milesRunGoal,
         updateKey: 'milesRunGoal',
         alwaysEnabled: true
+      }
+    ]
+  }
+
+  get chartData (): ChartDataSet[] {
+    return [
+      {
+        label: 'Actual',
+        data: this.actualData
+      }, {
+        label: 'Goal',
+        data: this.goalData
       }
     ]
   }

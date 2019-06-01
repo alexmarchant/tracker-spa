@@ -14,6 +14,7 @@ export type Day = {
   drinksGoal?: any
   mood?: any
   energy?: any
+  weight?: any
 }
 
 export function net (day: Day): number | null {
@@ -53,11 +54,17 @@ export function emptyDay (date: Date): Day {
     milesRun: null,
     milesRunGoal: null,
     drinks: null,
-    drinksGoal: null
+    drinksGoal: null,
+    weight: null
   }
 }
 
 export function parseDay (obj: any): Day {
   obj.date = parse(obj.date.split('T')[0])
   return obj as Day
+}
+
+export function formatDecimal (value: number): number {
+  if (!value) return value
+  return Math.round(value)
 }

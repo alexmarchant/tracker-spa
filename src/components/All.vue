@@ -9,7 +9,7 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs, { InputColumn } from './Inputs.vue'
-import { Day, attemptParseInt, net } from '../lib/day'
+import { Day, attemptParseInt, net, formatDecimal } from '../lib/day'
 import api from '../lib/api'
 
 const BMR = 2000
@@ -67,6 +67,9 @@ export default class Calories extends Vue {
         title: 'Energy',
         value: (day) => day.energy,
         updateKey: 'energy'
+      }, {
+        title: 'Weight',
+        value: (day) => formatDecimal(day.weight)
       }
     ]
   }

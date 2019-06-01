@@ -1,8 +1,7 @@
 <template>
   <dashboard
     :inputColumns="inputColumns"
-    :actual-chart-data="actualData"
-    :goal-chart-data="goalData"
+    :chart-data="chartData"
     :total="total"
   />
 </template>
@@ -11,8 +10,8 @@
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { getDaysInMonth, parse } from 'date-fns'
 import Inputs, { InputColumn } from './Inputs.vue'
-import Charts from './Charts.vue'
-import { Day, attemptParseInt, net } from '../lib/day'
+import Charts, { ChartDataSet } from './Charts.vue'
+import { Day, attemptParseInt, net, formatDecimal } from '../lib/day'
 import api from '../lib/api'
 import Dashboard from './Dashboard.vue'
 
@@ -47,6 +46,9 @@ export default class Calories extends Vue {
         value: (day) => day.caloriesGoal,
         updateKey: 'caloriesGoal',
         alwaysEnabled: true
+      }, {
+        title: 'Weight',
+        value: (day) => formatDecimal(day.weight)
       }
     ]
   }
@@ -59,6 +61,21 @@ export default class Calories extends Vue {
 
   get totalPounds (): number {
     return Math.round(this.totalCalories * 100 / 3500) / 100
+  }
+
+  get chartData (): ChartDataSet[] {
+    return [
+      {
+        label: 'Actual',
+        data: this.actualData
+      }, {
+        label: 'Goal',
+        data: this.goalData
+      }, {
+        label: 'Weight',
+        data: this.weightData
+      }
+    ]
   }
 
   get actualData (): any[] {
@@ -80,6 +97,22 @@ export default class Calories extends Vue {
       if (day.caloriesGoal !== undefined && day.caloriesGoal !== null) {
         total += day.caloriesGoal
         return total
+      } else {
+        return null
+      }
+    })
+  }
+
+  get weightData (): any[] {
+    var net: number = 0
+    var previousDay: Day
+    return this.$store.state.days.map((day: Day) => {
+      if (day.weight !== undefined && day.weight !== null) {
+        if (previousDay) {
+          net += (day.weight - previousDay.weight) * 3500
+        }
+        previousDay = day
+        return net
       } else {
         return null
       }

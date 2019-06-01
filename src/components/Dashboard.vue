@@ -8,8 +8,7 @@
     </div>
     <div class="charts-container">
       <charts
-        :actual-data="actualChartData"
-        :goal-data="goalChartData"
+        :data="chartData"
       />
     </div>
   </div>
@@ -35,9 +34,7 @@ export default class Dashboard extends Vue {
   @Prop()
   inputColumns!: InputColumn[]
   @Prop()
-  actualChartData!: any[]
-  @Prop()
-  goalChartData!: any[]
+  chartData!: any[]
   @Prop()
   total?: string
 }

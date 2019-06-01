@@ -1,15 +1,14 @@
 <template>
   <dashboard
     :inputColumns="inputColumns"
-    :actual-chart-data="actualData"
-    :goal-chart-data="goalData"
+    :chart-data="chartData"
   />
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import Inputs, { InputColumn } from './Inputs.vue'
-import Charts from './Charts.vue'
+import Charts, { ChartDataSet } from './Charts.vue'
 import { Day, attemptParseInt } from '../lib/day'
 import api from '../lib/api'
 import Dashboard from './Dashboard.vue'
@@ -33,6 +32,18 @@ export default class Drinks extends Vue {
         value: (day) => day.drinksGoal,
         updateKey: 'drinksGoal',
         alwaysEnabled: true
+      }
+    ]
+  }
+
+  get chartData (): ChartDataSet[] {
+    return [
+      {
+        label: 'Actual',
+        data: this.actualData
+      }, {
+        label: 'Goal',
+        data: this.goalData
       }
     ]
   }

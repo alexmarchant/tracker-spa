@@ -7,17 +7,19 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import Chart from 'chart.js'
 import { Day, net } from '../lib/day'
 
+export type ChartDataSet = {
+  label: string
+  data: any[]
+}
+
 @Component
 export default class Charts extends Vue {
   @Prop()
-  actualData!: any[]
-  @Prop()
-  goalData!: any[]
+  data!: ChartDataSet[]
   chart!: Chart
 
-  @Watch('actualData', { deep: true })
-  @Watch('goalData', { deep: true })
-  onDataChanged (val: Day[], oldVal: Day[]) {
+  @Watch('data', { deep: true })
+  onDataChanged () {
     this.recalculateChart()
   }
 
@@ -34,36 +36,42 @@ export default class Charts extends Vue {
   }
 
   createChart () {
+    const colors = [
+      'rgb(54, 162, 235)',
+      'rgb(255, 99, 132)',
+      'rgb(180, 222, 222)'
+    ]
+    const datasets = this.data.map((dataSet, i) => {
+      const color = colors[i % colors.length]
+      return {
+        label: dataSet.label,
+        data: dataSet.data,
+        backgroundColor: color,
+        borderColor: color,
+        fill: false,
+        spanGaps: true
+      }
+    })
+
     this.chart = new Chart(this.context, {
       type: 'line',
       data: {
         labels: this.labels,
-        datasets: [
-          {
-            label: 'actual',
-            data: this.actualData,
-            backgroundColor: 'rgb(54, 162, 235)',
-            borderColor: 'rgb(54, 162, 235)',
-            fill: false,
-            spanGaps: true
-          }, {
-            label: 'goal',
-            data: this.goalData,
-            borderDash: [5],
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            fill: false,
-            spanGaps: true
-          }
-        ]
+        datasets: datasets
+      },
+      options: {
+        animation: {
+          duration: 0
+        }
       }
     })
   }
 
   recalculateChart () {
     if (!this.chart) return
-    this.chart.data.datasets![0].data = this.actualData
-    this.chart.data.datasets![1].data = this.goalData
+    this.data.forEach((dataSet, i) => {
+      this.chart.data.datasets![i].data = dataSet.data
+    })
     this.chart.update()
   }
 }
