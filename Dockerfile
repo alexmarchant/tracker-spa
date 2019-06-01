@@ -1,16 +1,13 @@
 FROM node:10.15.0
 
-# Create app directory
-WORKDIR /app
-
 # Install app dependencies
+WORKDIR /install
 COPY package.json package-lock.json ./
-
 RUN npm install
-# If you are building your code for production
-# RUN npm install --only=production
+ENV NODE_PATH=/install/node_modules
 
 # Bundle app source
+WORKDIR /app
 COPY . .
 
 # Build js stuff
