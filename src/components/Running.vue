@@ -45,7 +45,8 @@ export default class Calories extends Vue {
         data: this.actualData
       }, {
         label: 'Goal',
-        data: this.goalData
+        data: this.goalData,
+        dashed: true
       }
     ]
   }

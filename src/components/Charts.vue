@@ -4,12 +4,13 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import Chart from 'chart.js'
+import Chart, { ChartDataSets } from 'chart.js'
 import { Day, net } from '../lib/day'
 
 export type ChartDataSet = {
   label: string
   data: any[]
+  dashed?: boolean
 }
 
 @Component
@@ -43,7 +44,7 @@ export default class Charts extends Vue {
     ]
     const datasets = this.data.map((dataSet, i) => {
       const color = colors[i % colors.length]
-      return {
+      const chartDataset: ChartDataSets = {
         label: dataSet.label,
         data: dataSet.data,
         backgroundColor: color,
@@ -51,6 +52,10 @@ export default class Charts extends Vue {
         fill: false,
         spanGaps: true
       }
+      if (dataSet.dashed) {
+        chartDataset.borderDash = [5]
+      }
+      return chartDataset
     })
 
     this.chart = new Chart(this.context, {
