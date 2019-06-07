@@ -66,5 +66,5 @@ export function parseDay (obj: any): Day {
 
 export function formatDecimal (value: number): number {
   if (!value) return value
-  return Math.round(value)
+  return Math.round(value * 10) / 10
 }
